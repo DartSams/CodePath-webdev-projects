@@ -1,0 +1,24 @@
+.complex{
+    width:auto;
+    background-color: white;
+    padding: 50px;
+    margin: 5px 5px 5px 5px;
+    text-align: center;
+}
+
+.complex:hover{
+    cursor: pointer;
+}
+
+.complex img{
+    width: 50%;
+    height: auto;
+}
+
+.complex button{
+    background-color: crimson;
+}
+
+.complex button:hover{
+    background-color: grey;
+}
