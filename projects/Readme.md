@@ -26,7 +26,7 @@ The following **additional** features are implemented:
 
 Here's a walkthrough of implemented required features:
 
-<img src='https://imgur.com/a/zQnGzHo.gif' title='Project 1 preview' width='' alt='Video Walkthrough' />
+<img src='project 1 preview.gif' title='Project 1 preview' width='' alt='Video Walkthrough' />
 
 GIF created with ...  
 [ScreenToGif](https://www.screentogif.com/) for Windows
