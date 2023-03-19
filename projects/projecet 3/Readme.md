@@ -1,4 +1,4 @@
-# Web Development Project 2 - *Flashcards*
+# Web Development Project 3 - *Flashcards Part 2*
 
 Submitted by: **Dartagnan Sams**
 
