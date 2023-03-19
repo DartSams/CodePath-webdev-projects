@@ -1,0 +1,66 @@
+#body-container{
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  overflow-y: hidden;
+}
+
+#previous,#ban-list{
+  width: 15vw;
+  height: 100vh;
+  background-color: aqua;
+  overflow-y: scroll;
+}
+
+#previous,#ban-list{
+  display: flex;
+  flex-direction: column;
+  justify-self: center;
+  align-items: center;
+  text-align: center;
+  margin-top: 30px;
+  padding: 10px;
+  text-align: center;
+}
+
+#body-container img{
+  width: 10vw;
+  height: 10vh;
+}
+
+#popupContainer{
+  width: 65vw;
+  height: fit-content;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+  background-color: aqua;
+}
+
+#popupContainer div{
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+  background-color: aqua;
+
+}
+
+#popupContainer #body #cat-attributes{
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  width: 100%;
+  height: 20px;
+}
+
+#popupContainer img{
+  margin-top: 30px;
+  width:30vw;
+  height:40vh
+}
