@@ -1,0 +1,11 @@
+#navbar-container{
+    display: flex;
+    width: 100vw;
+    background-color: grey;
+    padding:10px;
+    /* justify-content: space-around; */
+}
+
+#navbar-container button{
+    margin:5px;
+}

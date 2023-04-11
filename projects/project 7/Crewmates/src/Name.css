@@ -1,0 +1,7 @@
+#name-container{
+    width:fit-content;
+    height: fit-content;
+    padding: 20px;
+    background-color: red;
+    border-radius: 10px;
+}

@@ -1,0 +1,9 @@
+#color-container{
+    width:fit-content;
+    height: fit-content;
+    padding: 20px;
+    background-color: red;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+}
