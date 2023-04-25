@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% for i in data["post"] %}
+        {% if i[3] != "" %}
+            <title>{{i[0]}} on Twitter:"{{i[3]}}"</title>
+        {% else %}
+            <title>{{i[0]}}'s Post</title>
+        {%endif%}
+    {%endfor%}
+    <link rel="stylesheet" href="{{url_for('static',filename='stylesheets/post.css')}}">
+</head>
+<body>
+    <main>
+        <h2 class="title" style="color: white;display: flex; justify-content: center;">Website Users</h2>
+        <div class="container">
+            <div class="navbar">
+                <a href="/" class="flex-item"><span>Home</span></a>
+                {% if "username" in session %}
+                    <a href="/{{session['username']}}" class="flex-item">{{session["username"]}}</a>
+                {% elif "username" not in session %}
+                    <a href="/login" class="flex-item">Login</a>
+                {% endif %}
+            </div>
+
+            <div class="post">
+                {%for i in data["post"]%}
+                    <div class="post-detail">
+                        {% if i[1] == data["post date"] %}
+                            <p class="post-name">By <a href="/{{i[0]}}">{{i[0]}}</a> - {{i[2]}}
+                                {% if session["username"] == i[0] or data["admin status"]%}
+                                    <a href="/clear/{{i[6]}}" style="float: right; text-decoration: none; color:white">delete post</a>
+                                {% endif %}
+                            </p>
+                        {% else %}
+                            <p class="post-name">By <a href="/{{i[0]}}">{{i[0]}}</a> - {{i[5]}}
+                                {% if session["username"] == i[0] or data["admin status"]%}
+                                    <a href="/clear/{{i[6]}}" style="float: right; text-decoration: none; color:white">delete post</a>
+                                {% endif %}
+                            </p>
+                        {%endif%}
+
+                        {% if i[3] != None%}
+                            <p class="post-body" id="{{i[6]}}">{{i[3]}}</p>
+                        {%endif%}
+                        
+                        <div class="current-post-file">
+                            {% if i[4] != None %}
+                                {% if 'mp4' == i[4].split(".")[1] %}
+                                    <video controls width="320" height="240">
+                                        <source src="/static/preview_img/{{i[4].split('.')[0]}}.{{i[4].split('.')[1]}}" type="video/{{i[4].split('.')[1]}}">
+                                    Your browser does not support the audio element.
+                                    </video>
+
+                                {%elif 'mp3' == i[4].split(".")[1]%}
+                                    <audio controls width="320" height="240">
+                                        <source src="/static/preview_img/{{i[4].split('.')[0]}}.{{i[4].split('.')[1]}}" type="audio/{{i[4].split('.')[1]}}">
+                                    Your browser does not support the audio element.
+                                    </audio>
+
+                                {%endif%}
+
+                                {% for pic_type in data["Allowed Extensions"] %}
+                                    {% if pic_type == i[4].split(".")[1] %}
+                                        <img src="/static/preview_img/{{i[4]}}" alt="">
+                                    {%endif%}
+                                {%endfor%}
+                            {%endif%}
+                        </div>
+                        
+                        <div class="post-buttons">
+                            <a id="4" name="Reply" class="Reply" value="{{i[6]}}" href="{{i[6]}}"><img src="/static/buttons/reply1.png" alt="">Reply</a>  
+                            <button id="4" name="Retweet" class="Retweet" value="{{i[6]}}"><img src="/static/buttons/retweet.png" alt="" onclick="retweet(id)" id="post:{{i[3]}}">Retweet</button> 
+                            {% if like_lst %}
+                                {% if like_lst[1] == i[6] %}
+                                    {% if like_lst[0] == session["username"] %}
+                                        <button id="4" name="UnLike" class="Like" value="{{i[6]}}"><img src="/static/buttons/unlike.png" alt="" onclick="changeLike(id)" id="unlike:{{i[6]}}">Like</button>  
+                                        
+                                    {% else %}
+                                        <button id="4" name="Like" class="Like" value="{{i[6]}}"><img src="/static/buttons/like.png" alt="" onclick="changeLike(id)" id="like:{{i[6]}}">Like</button>  
+                                    {%endif%}    
+                                {% else %}
+                                    <button id="4" name="Like" class="Like" value="{{i[6]}}"><img src="/static/buttons/like.png" alt="" onclick="changeLike(id)" id="like:{{i[6]}}">Like</button>  
+                                {%endif%}
+                            {% else %}
+                                <button id="4" name="Like" class="Like" value="{{i[6]}}"><img src="/static/buttons/like.png" alt="" onclick="changeLike(id)" id="like:{{i[6]}}">Like</button>  
+                            {%endif%}
+                            <button id="4" name="Share" class="Share" value="{{i[6]}}"><img src="/static/buttons/black heart.png" alt="">Share</button>  
+                        </div>
+
+                    </div>
+                {%endfor%}
+
+                    {% if "username" in session %}
+                        <form action=""  method="POST" enctype=multipart/form-data>
+                            <textarea name="comment-field" id="myComment" cols="50" rows="5" placeholder="Type Here"></textarea>
+                            <div class="form-buttons">
+                                <input type="file" name="file" >
+                                <button type="submit">Upload</button>
+                            </div>
+                        </form>
+                        <button onclick="onNewComment()" style="width: 500px;color:black">Post</button>
+                    {%endif%}
+
+
+                    <h1>Comments</h1>
+                    <div class="comment-list" id="comment-list">
+                            {%for i in data["comments"] %}
+                            <div class="post-detail">
+                                {% if i[1] == data["post date"] %}
+                                    <p class="post-name">By <a href="/{{i[0]}}">{{i[0]}}</a> - {{i[2]}}</p>
+                                {% else %}
+                                    <p class="post-name">By {{i[0]}} - {{i[5]}}</p>
+                                {%endif%}
+
+                                <p class="post-body">{{i[3].capitalize()}}</p>
+                                
+                                {% if i[4] != None %}
+                                    {% if 'mp4' == i[4].split(".")[1] %}
+                                        <video controls>
+                                            <source src="/static/preview_img/{{i[4].split('.')[0]}}.{{i[4].split('.')[1]}}" type="video/{{i[4].split('.')[1]}}">
+                                        Your browser does not support the audio element.
+                                        </video>
+
+                                    {%elif 'mp3' == i[4].split(".")[1]%}
+                                        <audio controls>
+                                            <source src="/static/preview_img/{{i[4].split('.')[0]}}.{{i[4].split('.')[1]}}" type="audio/{{i[4].split('.')[1]}}">
+                                        Your browser does not support the audio element.
+                                        </audio>
+
+                                    {%endif%}
+
+                                    {% for pic_type in data["Allowed Extensions"] %}
+                                        {% if pic_type == i[4].split(".")[1] %}
+                                            <img src="/static/preview_img/{{i[4]}}" alt="" width="60" height="100">
+                                        {%endif%}
+                                    {%endfor%}
+                                {%endif%}
+                            </div>
+                            
+                        {%endfor%}
+
+                        <div class="no-comments">
+                            {% if not data["comments"] %}
+                                <p style="color:white">
+                                    {% with messages = get_flashed_messages()%}
+                                        {% if messages %}
+                                            {% for message in messages%}
+                                                {{message}}
+                                                <br>
+                                                <br>
+                                            {%endfor%}
+                                        {%endif%}
+                                    {%endwith%}
+                                </p>
+                            {%endif%}
+                        </div>
+                        
+                    </div>
+                    
+            </div>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
+
+        <script type="text/javascript" charset="utf-8">
+            var socket = io();
+            var username = "{{session['username']}}"
+
+            socket.on("message",function(msg){
+                try {
+                    let removeComments = document.querySelector(".no-comments")
+                    removeComments.parentNode.removeChild(removeComments)
+                } catch (error) {
+                    console.error(error);
+                }
+                
+
+                var postDiv = document.createElement("div");
+                postDiv.setAttribute("class","post-detail");
+                postDiv.style.color = "white";
+
+                var postHeader = document.createElement("a");
+                postHeader.setAttribute("class","post-name");
+                postHeader.setAttribute("href",`/${msg.author}`);
+
+                postHeader.innerHTML = `By ${msg.author} - ${msg.post_time}`;
+                postHeader.style.color = "white";
+                postDiv.appendChild(postHeader);
+
+                var post = document.createElement("p");
+                post.setAttribute("class","post-body")
+                post.innerHTML = `${msg.comment}`
+                postDiv.appendChild(post);
+
+
+                document.getElementById("comment-list").prepend(postDiv); 
+                document.getElementById('myComment').value = ''
+            });
+
+            function myFunction() {
+                let send_message = document.getElementById("myPost").value;
+                socket.emit("message",{message:send_message})
+            };
+
+            function changeLike(id) {
+                let button = document.getElementById(id).id
+                let splitButton = button.split(":");
+                var likeStatus = splitButton[0];
+                var likeID = splitButton[1];
+
+                if (likeStatus === "like") {
+                    document.getElementById(id).src = "/static/buttons/unlike.png";
+                    socket.emit("changeLike",{user:username,status:likeStatus,id:likeID})
+                    document.getElementById(id).id = `unlike:${likeID}`
+                } else if (likeStatus === "unlike") {
+                    document.getElementById(id).src = "/static/buttons/like.png";
+                    socket.emit("changeLike",{user:username,status:likeStatus,id:likeID})
+                    document.getElementById(id).id = `like:${likeID}`
+                }
+            }
+
+            function retweet(id) {
+                let button = document.getElementById(`${id}`).id
+                let splitButton = button.split(":");
+                let postMessage = splitButton[1]
+                let socketType = "newComment"
+
+                socket.emit("message",{message:postMessage,type:socketType})
+            }
+            
+            function onNewComment() {
+                let comment = document.getElementById("myComment").value
+                let commentID = document.querySelector(".post-body").id
+                let socketType = "newComment"
+
+                socket.emit("makeComment",{user:username,comment:comment,commentID:commentID,type:socketType})
+            }
+        </script>
+    </main>
+</body>
+</html>

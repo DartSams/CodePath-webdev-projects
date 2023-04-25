@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% for i in data["profile_details"] %}
+        <title>{{i[0]}} (@{{i[1]}})</title>
+    {%endfor%}
+    <link rel="stylesheet" href="{{url_for('static',filename='stylesheets/profile.css')}}">
+</head>
+<body>
+    <main>
+        <div class="container">
+            <div class="navbar">
+                <a href="/" class="flex-item">Home</a>
+                {% if "username" in session %}
+                    <a href="/{{session['username']}}" class="flex-item" id="active">{{session["username"]}}</a>
+                {% elif "username" not in session %}
+                    <a href="/login">Login</a>
+                {% endif %}
+            </div>
+            
+                <div class="container-middle">
+                    {% if data["profile_details"] %}
+                        <div class="container-middle-top">
+                            {% for i in data["profile_details"] %}
+                                <img src='/static/preview_img/{{i[11]}}' alt="{{i[11]}}" id="profile-banner">
+                                <img src='/static/preview_img/{{i[12]}}' alt="{{i[12]}}" id="profile-img">
+                                <div>
+                                    <form action="" method="POST">
+                                        {% if session["username"] %}
+                                            {% if data["username"] == session['username'] %}
+                                                <button name="Settings"><a class="profile-edit">Edit Account</a></button>
+                                            {% else %}
+                                                {% if data["all ready followed"][0] == session["username"] %}
+                                                    <button name="UnFollow" value="{{session['username']}}" ><a class="profile-edit">Already Following</a></button>
+                                                {% else %}
+                                                    <button name="Follow" value="{{i[1]}}"><a class="profile-edit">Follow</a></button>
+                                                {%endif%}
+                                            {%endif%}
+                                        {% else %}
+                                            <br>
+                                            <br>
+                                            <br>
+                                        {%endif%}
+                                    </form>
+                                </div>
+
+                                <div class="profile-description">
+                                    <h3 style="color: white;">{{i[0]}}</h3>
+                                    <p style="color: white;">@{{i[1]}}</p>
+                                    <p style="color: white;">{{i[10]}}</p>
+                                    <div class="follow" style="color: white;">
+                                        <a href="/{{i[1]}}/followers">{{data["Amount of followers"]}} Followers |</a> 
+                                        <a href="/{{i[1]}}/following">| {{data["Following Amount"]}} Following</a>
+                                    </div>
+                                </div>
+
+                                <div class="profile-tabs">
+                                    <a href="/{{i[1]}}" class="active">All Post</a>
+                                    <a href="/{{i[1]}}/Replies">Replies</a>
+                                    <a href="/{{i[1]}}/Likes">Likes</a>
+                                </div>
+                            {%endfor%}
+                        </div>
+                    {%endif%}
+                        {% if data["post"] %}
+                        <div class="post-board">
+                            
+                            <div class="post">
+                                {%for i in data["post"] %}
+                                    <a href="/{{i[6]}}">
+                                        <div>
+                                            <div class="post-detail">
+                                                {% if i[1] == data["post date"] %}
+                                                    <p class="post-name">By {{i[0]}} - {{i[2]}}</p>
+                                                {% else %}
+                                                    <p class="post-name">By {{i[0]}} - {{i[5]}}</p>
+                                                {%endif%}
+
+                                                <p class="post-body">{{i[3]}}</p>
+                                                
+                                                {% if i[4] != None %}
+                                                    {% if 'mp4' == i[4].split(".")[1] %}
+                                                        <video controls width="320" height="240">
+                                                            <source src="/static/preview_img/{{i[4].split('.')[0]}}.{{i[4].split('.')[1]}}" type="video/{{i[4].split('.')[1]}}">
+                                                        Your browser does not support the audio element.
+                                                        </video>
+
+                                                    {% elif 'mp3' == i[4].split(".")[1]%}
+                                                        <audio controls width="320" height="240">
+                                                            <source src="/static/preview_img/{{i[4].split('.')[0]}}.{{i[4].split('.')[1]}}" type="audio/{{i[4].split('.')[1]}}">
+                                                        Your browser does not support the audio element.
+                                                        </audio>
+
+                                                    {%endif%}
+
+                                                    {% for pic_type in data["Allowed Extensions"] %}
+                                                        {% if pic_type == i[4].split(".")[1] %}
+                                                            <img src="/static/preview_img/{{i[4]}}" alt="">
+                                                        {%endif%}
+                                                    {%endfor%}
+                                                {%endif%}
+
+                                                <div class="likes">
+                                                    <br>
+                                                    <form action="" method="post" class="post-buttons">
+                                                        <button id="4" name="Reply" class="Reply" value="{{i[6]}}"><img src="/static/buttons/reply1.png" alt="">Reply</button>  
+                                                        <button id="4" name="Retweet" class="Retweet" value="{{i[6]}}"><img src="/static/buttons/retweet.png" alt="">Retweet</button> 
+                                                        {% if data["like lst"] %}
+                                                            {% for j in data["like lst"] %}
+                                                                {% if j[1] == i[6] %}
+                                                                    {% if session["username"] == j[0] %}
+                                                                        <button id="4" name="UnLike" class="Like" value="{{i[6]}}"><img src="/static/buttons/unlike.png" alt="">Like</button>  
+                                                                    {%endif%}
+                                                                {%endif%}
+                                                            {%endfor%}
+                                                        {%endif%}
+            
+                                                        {% if i[6] not in data["like id"] %}
+                                                            <button id="4" name="Like" class="Like" value="{{i[6]}}"><img src="/static/buttons/like.png" alt="">Like</button>  
+                                                        {%endif%}
+                                                        <button id="4" name="Share" class="Share" value="{{i[6]}}"><img src="/static/buttons/black heart.png" alt="">Share</button>  
+                                                    </form>        
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                {%endfor%}
+                            </div>
+                        </div>
+
+                    {% elif not data["post"] %}
+                        <p style="color:white">
+                            {% with messages = get_flashed_messages()%}
+                                {% if messages %}
+                                    {% for message in messages%}
+                                        {{message}}
+                                        <br>
+                                        <br>
+                                    {%endfor%}
+                                {%endif%}
+                            {%endwith%}
+                        </p>
+                    {%endif%}
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+
+</html>

@@ -1,0 +1,147 @@
+
+#active{
+    color:rgb(29, 161, 242);
+}
+
+#active:hover{
+    color:white
+}
+
+.container{
+    display:flex;
+    flex-direction: row;
+    justify-content: space-around;
+    color:white
+}
+
+.container .navbar{
+    position: fixed;
+    left:0;
+    bottom:0;
+}
+
+.container .navbar a{
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    color: white;
+    font-size: 25px;
+    margin-bottom: 10%;
+    padding: 10px;
+}
+
+.navbar .flex-item:hover{
+    background-color: rgb(29, 161, 242);
+    border-radius: 30px;
+    padding: 10px;
+    display: inline-flex;
+}
+
+.to-profile{
+    display: flex;
+    flex-direction: row;
+}
+
+.flex-item{
+    display: flex;
+    flex-direction: row;
+}
+
+body{
+    background-color: black;
+}
+
+a{
+    text-decoration: none;
+}
+
+.search-bar{
+    color: white;
+    display: flex;
+    justify-content: center;
+    flex-direction: row;
+}
+
+.search-bar input{
+    width:500px;
+}
+
+.search-bar button img{
+    width:30px;
+    cursor: pointer;
+}
+
+.all-post{
+    width:500px;
+    border-style: solid;
+    border-color: white;
+    padding: 20px;
+    margin-bottom: 10px;
+}
+
+.create-post textarea {
+    width:500px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
+}
+
+.form-buttons{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.form-buttons button,.form-buttons input {
+    color:black
+}
+
+.form-buttons input {
+    color:white
+}
+
+button,button a{
+    text-decoration: none;
+}
+
+form input,button a{
+    color:black;
+    text-decoration: none;
+}
+
+.post-board{
+    display: flex;
+    flex-direction: column-reverse;
+}
+
+.post-board p{
+    color: white;
+    text-decoration: none;
+}
+
+.post-detail{
+    border-style: solid;
+    border-color: white;
+    padding: 20px;
+    margin-bottom: 10px;
+}
+
+.likes{
+    display:flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.likes button,.likes a,.likes button img,.likes a img,.likes button{
+    width:30px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    color:white
+}

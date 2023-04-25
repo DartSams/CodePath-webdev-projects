@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='stylesheets/index.css') }}" />
+</head>
+<body>
+    <main>
+        <div>
+            <form action="" method="post" class="search-bar">
+                <input type="text" name="search-bar" placeholder="Search..">
+                <button name="enter-search" value=""><img src="/static/buttons/search-icon.png" alt=""></button>  
+            </form>
+        </div>
+
+        <div class="container">
+            <div class="navbar" >
+                <a href="/" class="flex-item" id="active"><span>Home</span></a>
+                {% if "username" in session %}
+                    <a href="/{{session['username']}}" class="flex-item">{{session["username"]}}</a>
+                {% elif "username" not in session %}
+                    <a href="/login" class="flex-item">Login</a>
+                {% endif %}
+            </div>
+                
+            <div class="all-post">
+                {% if "username" in session%}
+
+                    <form action=""  method="POST" enctype=multipart/form-data>
+                        <div class="create-post">
+                            <textarea name="post-field" id="myPost" cols="50" rows="5" style="resize: none;"></textarea>
+                            <div class="form-buttons">
+                                <input type="file" name="file" >
+                                <button type="submit">Upload</button>
+                            </div>
+                        </div>
+                    </form>
+                    <button onclick="myFunction()" style="color:black;width:500px" id="socket-post">Post</button>
+                {%endif%}
+
+                <div class="post-board">
+                    <div class="post" id="post">
+                        {%for i in data["all post"] %}
+                            <a href="/{{i[6]}}" >
+                            <div class="post-detail">
+                                {% if i[1] == data["post date"] %}
+                                    <p class="post-name">By {{i[0]}} - {{i[2]}}</p>
+
+                                {% else %}
+                                    <p class="post-name">By {{i[0]}} - {{i[5]}}</p>
+                                {%endif%}
+
+                                {% if i[3] != None%}
+                                    <p class="post-body" id="{{i[6]}}">{{i[3]}}</p>
+                                {%endif%}
+                                
+                                {% if i[4] != None %}
+                                    {% if 'mp4' == i[4].split(".")[1] %}
+                                        <video controls width="320" height="240">
+                                            <source src="/static/preview_img/{{i[4].split('.')[0]}}.{{i[4].split('.')[1]}}" type="video/{{i[4].split('.')[1]}}">
+                                        Your browser does not support the audio element.
+                                        </video>
+
+                                    {%elif 'mp3' == i[4].split(".")[1]%}
+                                        <audio controls width="320" height="240">
+                                            <source src="/static/preview_img/{{i[4].split('.')[0]}}.{{i[4].split('.')[1]}}" type="audio/{{i[4].split('.')[1]}}">
+                                        Your browser does not support the audio element.
+                                        </audio>
+
+                                    {%endif%}
+
+                                    {% for pic_type in data["extensions"]%}
+                                        {% if pic_type == i[4].split(".")[1] %}
+                                            <img src="/static/preview_img/{{i[4]}}" alt="">
+                                        {%endif%}
+                                    {%endfor%}
+
+                                {%endif%}
+                            </a> 
+
+                            <div class="likes" >
+                                <a name="Reply" class="Reply" value="{{i[6]}}" href="/{{i[6]}}"><img src="/static/buttons/reply1.png" alt="">Reply</a>  
+                                <button name="Retweet" class="Retweet" value="{{i[6]}}"><img src="/static/buttons/retweet.png" alt="" onclick="retweet(id)" id="post:{{i[3]}}">Retweet</button> 
+                                {% if data["like lst"] %}
+                                    {% for j in data["like lst"] %}
+                                        {% if j[1] == i[6] %}
+                                            {% if session["username"] == j[0] %}
+                                                <button name="UnLike" class="Like" value="{{i[6]}}" ><img src="/static/buttons/unlike.png" alt="" onclick="changeLike(id)" id="unlike:{{i[6]}}">Like</button>  
+                                            {%endif%}
+                                        {%endif%}
+                                    {%endfor%}
+                                {%endif%}
+
+                                {% if i[6] not in data["like lst id"] %}
+                                    <button name="Like" class="Like" value="{{i[6]}}"><img src="/static/buttons/like.png" alt="" onclick="changeLike(id)" id="like:{{i[6]}}">Like</button>  
+                                {%endif%}
+                                <button name="Report" class="Report" value="{{i[6]}}"><img src="/static/buttons/flag-icon.png" alt="" onclick="reportPost(id)" id="{{i[6]}}">Report</button>  
+                            </div>
+                        </div>
+                        {%endfor%}
+
+                        
+                    </div>
+                </div>
+            </div>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
+
+            <script type="text/javascript" charset="utf-8">
+                var socket = io();
+                var username = "{{session['username']}}"
+
+                socket.on("message",function(msg){
+                    var toPost = document.createElement("a");
+                    toPost.setAttribute("href",`/${msg.postID}`)
+
+
+                    var postDiv = document.createElement("div");
+                    postDiv.setAttribute("class","post-detail");
+                    postDiv.style.color = "white";
+
+                    var postHeader = document.createElement("a");
+                    postHeader.setAttribute("class","post-name");
+                    postHeader.setAttribute("href",`/${msg.postID}`);
+
+                    postHeader.innerHTML = `By ${msg.author} - ${msg.post_time}`;
+                    postHeader.style.color = "white";
+                    postDiv.appendChild(postHeader);
+
+                    var post = document.createElement("p");
+                    post.setAttribute("class","post-body")
+                    post.innerHTML = `${msg.post}`
+                    postDiv.appendChild(post);
+
+                    var postButtonDiv = document.createElement("div");
+                    var postButtons = document.createElement("div");
+                    postButtons.setAttribute("class","likes")
+
+
+                    var reply = document.createElement("a");
+                    var replyImage = document.createElement("img");
+                    replyImage.setAttribute("src","/static/buttons/reply1.png")
+                    reply.setAttribute("href",`/${msg.postID}`);
+                    reply.appendChild(replyImage)
+                    postButtons.appendChild(reply)
+
+                    var retweet = document.createElement("button");
+                    var retweetImage = document.createElement("img");
+                    retweetImage.setAttribute("src","/static/buttons/retweet.png")
+                    retweetImage.setAttribute("onclick","retweet(id)")
+                    retweetImage.setAttribute("id",`post:${msg.post}`)
+                    retweet.appendChild(retweetImage)
+                    postButtons.appendChild(retweet)
+
+                    var like = document.createElement("button");
+                    var likeImage = document.createElement("img");
+                    likeImage.setAttribute("src","/static/buttons/like.png")
+                    likeImage.setAttribute("onclick","changeLike(id)")
+                    likeImage.setAttribute("id",`like:${msg.postID}`)
+                    like.appendChild(likeImage)
+                    postButtons.appendChild(like)
+
+                    var report = document.createElement("button");
+                    var reportImage = document.createElement("img");
+                    reportImage.setAttribute("src","/static/buttons/flag-icon.png")
+                    report.appendChild(reportImage)
+                    postButtons.appendChild(report)
+
+                    postButtonDiv.appendChild(postButtons)
+                    postDiv.appendChild(postButtonDiv);
+                    toPost.appendChild(postDiv)
+
+                    document.getElementById("post").prepend(toPost); 
+                    document.getElementById('myPost').value = ''
+                });
+
+                function myFunction() {
+                    let send_message = document.getElementById("myPost").value;
+                    let socketType = "newPost"
+                    socket.emit("message",{message:send_message,type:socketType})
+                };
+
+                function changeLike(id) {
+                    let button = document.getElementById(id).id
+                    let splitButton = button.split(":");
+                    var likeStatus = splitButton[0];
+                    var likeID = splitButton[1];
+
+                    if (likeStatus === "like") {
+                        document.getElementById(id).src = "/static/buttons/unlike.png";
+                        socket.emit("changeLike",{user:username,status:likeStatus,id:likeID})
+                        document.getElementById(id).id = `unlike:${likeID}`
+                    } else if (likeStatus === "unlike") {
+                        document.getElementById(id).src = "/static/buttons/like.png";
+                        socket.emit("changeLike",{user:username,status:likeStatus,id:likeID})
+                        document.getElementById(id).id = `like:${likeID}`
+                    }
+                }
+
+                function retweet(id) {
+                    let button = document.getElementById(`${id}`).id
+                    let splitButton = button.split(":");
+                    let postMessage = splitButton[1]
+                    let socketType = "retweetPost"
+                    socket.emit("message",{message:postMessage,type:socketType})
+                }
+
+                function reportPost(id) {
+                    socket.emit("reportPost",{user:username,id:id})
+                }
+            </script>
+        </div>
+    </main>
+</body>
+</html>
